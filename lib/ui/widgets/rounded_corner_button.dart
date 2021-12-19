@@ -6,13 +6,15 @@ class RoundedCornerButton extends StatelessWidget {
   const RoundedCornerButton({
     Key? key,
     required this.backgroundColor,
-    required this.textColor,
-    required this.label,
+    this.textColor,
+    this.label,
     required this.onPressed,
+    this.loadingWidget,
   }) : super(key: key);
   final Color backgroundColor;
-  final Color textColor;
-  final String label;
+  final Color? textColor;
+  final String? label;
+  final Widget? loadingWidget;
   final Function() onPressed;
 
   @override
@@ -23,19 +25,20 @@ class RoundedCornerButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(45),
       ),
       color: backgroundColor,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: kDefaultVerticalPadding * 0.75,
-          horizontal: kDefaultHorizontalPadding / 2,
-        ),
-        child: Text(
-          label,
-          style: Theme.of(context)
-              .textTheme
-              .headline3!
-              .copyWith(color: textColor, fontSize: 16.sp),
-        ),
-      ),
+      child: loadingWidget ??
+          Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: kDefaultVerticalPadding * 0.75,
+              horizontal: kDefaultHorizontalPadding / 2,
+            ),
+            child: Text(
+              label!,
+              style: Theme.of(context)
+                  .textTheme
+                  .headline3!
+                  .copyWith(color: textColor!, fontSize: 16.sp),
+            ),
+          ),
     );
   }
 }

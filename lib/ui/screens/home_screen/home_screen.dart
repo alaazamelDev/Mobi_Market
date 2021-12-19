@@ -1,4 +1,7 @@
-import 'package:products_management/data/models/models.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:products_management/data/repositories/shared_prefs_repository.dart';
+import 'package:products_management/logic/auth/auth_bloc.dart';
+import 'package:products_management/logic/logout/logout_bloc.dart';
 import 'package:products_management/ui/screens/add_product_screen/add_product_screen.dart';
 import 'package:products_management/constants/constants.dart';
 import 'package:products_management/ui/screens/screens.dart';
@@ -15,14 +18,105 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: Row(
+        children: [
+          const CircularProgressIndicator(color: kRichBlackColor),
+          Container(
+            margin: EdgeInsets.only(left: kDefaultHorizontalPadding * 0.5),
+            child: Text(
+              'Logging out...',
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  // warning dialog before cancel insertion
+  void showWarningDialog({
+    required BuildContext context,
+    required String title,
+    required Widget content,
+    List<Widget>? actions,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        elevation: 24,
+        actions: [
+          TextButton(
+            onPressed: () {
+              // todo: add LogoutButtonPressede event to logoutBloc
+              BlocProvider.of<LogoutBloc>(context).add(LogoutButtonPressed());
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Yes',
+              style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: kRichBlackColor,
+                  ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              'No',
+              style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: kRichBlackColor,
+                  ),
+            ),
+          ),
+        ],
+        title: Text(
+          'Warning',
+          style: Theme.of(context)
+              .textTheme
+              .headline5!
+              .copyWith(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: Theme.of(context).textTheme.bodyText1,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MainAppBar(
         title: 'STORE',
-        leading: StyledIconButton(
-          icon: Icons.menu_rounded,
-          onPressed: () {},
+        leading: BlocListener<LogoutBloc, LogoutState>(
+          listener: (context, state) {
+            if (state is LogoutLoading) {
+              showLoaderDialog(context);
+            }
+            if (state is LogoutInitial) {
+              Navigator.pop(context);
+            }
+          },
+          child: StyledIconButton(
+            icon: Icons.logout_rounded,
+            onPressed: () {
+              context.read<LogoutBloc>().add(LogoutButtonPressed());
+            },
+          ),
         ),
         actions: [
           StyledIconButton(

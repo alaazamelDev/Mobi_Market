@@ -72,8 +72,8 @@ class Product {
       expiryDate: map['expiryDate'] ?? '',
       category: Category.fromMap(map['category']),
       phoneNumber: map['phoneNumber'] ?? '',
+      quantity: map['quantity']?.toInt() ?? 0,
       owner: User.fromMap(map['owner']),
-      quantity: map['quantity'] ?? 0,
     );
   }
 

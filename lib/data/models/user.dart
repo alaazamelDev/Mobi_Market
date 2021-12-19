@@ -4,7 +4,7 @@ class User {
   int id;
   String name;
   String email;
-  dynamic? emailVerifiedAt;
+  dynamic emailVerifiedAt;
   DateTime? createdAt;
   DateTime? updatedAt;
   User({
@@ -20,7 +20,7 @@ class User {
     int? id,
     String? name,
     String? email,
-    dynamic? emailVerifiedAt,
+    dynamic emailVerifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -50,7 +50,7 @@ class User {
       id: map['id']?.toInt() ?? 0,
       name: map['name'] ?? '',
       email: map['email'] ?? '',
-      emailVerifiedAt: map['emailVerifiedAt'] ?? null,
+      emailVerifiedAt: map['emailVerifiedAt'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
     );
