@@ -43,12 +43,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   // warning dialog before cancel insertion
-  void showWarningDialog({
-    required BuildContext context,
-    required String title,
-    required Widget content,
-    List<Widget>? actions,
-  }) {
+  void showWarningDialog(
+    BuildContext context,
+  ) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -58,7 +55,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               // todo: add LogoutButtonPressede event to logoutBloc
-              BlocProvider.of<LogoutBloc>(context).add(LogoutButtonPressed());
+              context.read<LogoutBloc>().add(LogoutButtonPressed());
               Navigator.pop(context);
             },
             child: Text(
@@ -114,7 +111,7 @@ class HomeScreen extends StatelessWidget {
           child: StyledIconButton(
             icon: Icons.logout_rounded,
             onPressed: () {
-              context.read<LogoutBloc>().add(LogoutButtonPressed());
+              showWarningDialog(context);
             },
           ),
         ),
