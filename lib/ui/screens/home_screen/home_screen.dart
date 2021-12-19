@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:products_management/data/repositories/shared_prefs_repository.dart';
-import 'package:products_management/logic/auth/auth_bloc.dart';
 import 'package:products_management/logic/logout/logout_bloc.dart';
 import 'package:products_management/ui/screens/add_product_screen/add_product_screen.dart';
 import 'package:products_management/constants/constants.dart';
@@ -43,9 +41,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   // warning dialog before cancel insertion
-  void showWarningDialog(
-    BuildContext context,
-  ) {
+  void showWarningDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,

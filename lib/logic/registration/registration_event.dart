@@ -6,3 +6,23 @@ abstract class RegistrationEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class RegisterButtonPressed extends RegistrationEvent {
+  final String name;
+  final String email;
+  final String password;
+
+  const RegisterButtonPressed({
+    required this.name,
+    required this.email,
+    required this.password,
+  });
+
+  @override
+  List<Object> get props => [name, email, password];
+
+  @override
+  String toString() {
+    return 'RegistrationButtonPressed {name: $name, email: $email, password: $password}';
+  }
+}

@@ -5,11 +5,13 @@ import 'package:http/http.dart' as http;
 class AuthServiceProvider {
   static const String _apiRootURL = 'https://used-products.herokuapp.com/api';
   static const String _loginPath = '/login';
+  static const String _registerPath = '/register';
   static const String _logoutPath = '/logout';
 
   // Request Keys
   static const _acceptKey = 'Accept';
   static const _authorizationKey = 'Authorization';
+  static const _nameKey = 'name';
   static const _emailKey = 'email';
   static const _passwordKey = 'password';
 
@@ -29,7 +31,7 @@ class AuthServiceProvider {
    */
   Future<dynamic> loginUser(String email, String password) async {
     // validate email & password
-    if (email.isEmpty || email.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       return null;
     }
 
@@ -42,6 +44,37 @@ class AuthServiceProvider {
           _acceptKey: _acceptValue,
         },
         body: {
+          _emailKey: email,
+          _passwordKey: password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['access_token'];
+      }
+    } catch (ex) {
+      return null;
+    }
+    return null;
+  }
+
+  Future<dynamic> registerUser(
+      String name, String email, String password) async {
+    // validate email & password
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      return null;
+    }
+
+    http.Response response;
+    try {
+      // pass data in request body of post request method
+      response = await http.post(
+        Uri.parse(_apiRootURL + _registerPath),
+        headers: {
+          _acceptKey: _acceptValue,
+        },
+        body: {
+          _nameKey: name,
           _emailKey: email,
           _passwordKey: password,
         },

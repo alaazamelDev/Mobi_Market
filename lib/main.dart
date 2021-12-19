@@ -11,6 +11,7 @@ import 'package:products_management/data/repositories/shared_prefs_repository.da
 import 'package:products_management/logic/auth/auth_bloc.dart';
 import 'package:products_management/logic/login/login_bloc.dart';
 import 'package:products_management/logic/logout/logout_bloc.dart';
+import 'package:products_management/logic/registration/registration_bloc.dart';
 import 'package:products_management/ui/screens/screens.dart';
 
 void main() async {
@@ -46,6 +47,12 @@ void main() async {
           authRepository: authRepository,
           authBloc: context.read<AuthBloc>(),
         ),
+      ),
+      BlocProvider(
+        create: (context) => RegistrationBloc(
+          authRepository: authRepository,
+          authBloc: context.read<AuthBloc>(),
+        ),
       )
     ],
     child: MyApp(authRepository: authRepository),
@@ -67,9 +74,7 @@ class MyApp extends StatelessWidget {
         color: kOxfordBlueColor,
         onGenerateRoute: AppRouter.onGenerateRoute,
         home: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            
-          },
+          listener: (context, state) {},
           builder: (context, state) {
             if (state is AuthAuthenticated) {
               return const HomeScreen();

@@ -1,4 +1,0 @@
-enum AuthError {
-  invalidCredentials,
-  unknownError,
-}

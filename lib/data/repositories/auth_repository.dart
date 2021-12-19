@@ -31,6 +31,11 @@ class AuthRepository {
     return response;
   }
 
+  Future register(String name, String email, String password) async {
+    var response = await _authProvider.registerUser(name, email, password);
+    return response;
+  }
+
   // send logout request
   Future logout(String token) async {
     var response = await _authProvider.logoutUser(token);
