@@ -1,52 +1,21 @@
-import 'dart:convert';
-
 class Category {
-  int id;
-  String name;
+  int? id;
+  String? name;
+
   Category({
-    required this.id,
-    required this.name,
+    this.id,
+    this.name,
   });
 
-  Category copyWith({
-    int? id,
-    String? name,
-  }) {
-    return Category(
-      id: id ?? this.id,
-      name: name ?? this.name,
-    );
+  Category.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-    };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    return data;
   }
-
-  factory Category.fromMap(Map<String, dynamic> map) {
-    return Category(
-      id: map['id']?.toInt() ?? 0,
-      name: map['name'] ?? '',
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory Category.fromJson(String source) =>
-      Category.fromMap(json.decode(source));
-
-  @override
-  String toString() => 'Category(id: $id, name: $name)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Category && other.id == id && other.name == name;
-  }
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode;
 }

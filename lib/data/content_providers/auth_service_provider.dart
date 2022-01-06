@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthServiceProvider {
-  static const String _apiRootURL = 'https://used-products.herokuapp.com/api';
+  //static const String _apiRootURL = 'https://used-products.herokuapp.com/api';
+  static const String _apiRootURL = 'http://192.168.1.106:8000/api';
   static const String _loginPath = '/login';
   static const String _registerPath = '/register';
   static const String _logoutPath = '/logout';

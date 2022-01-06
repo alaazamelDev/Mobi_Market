@@ -51,115 +51,110 @@ class LoginScreen extends StatelessWidget {
             Navigator.pop(context);
           }
         },
-        child: BlocBuilder<LoginBloc, LoginState>(
-          builder: (context, state) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.99,
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: kDefaultVerticalPadding,
-                    horizontal: kDefaultHorizontalPadding,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: kDefaultVerticalPadding * 2),
-                      Text(
-                        'Login',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline2!
-                            .copyWith(color: kOxfordBlueColor),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: kDefaultVerticalPadding * 2),
-                      AspectRatio(
-                        aspectRatio: ResponsiveDesign(context).getAspectRatio(),
-                        child: SvgPicture.asset('assets/images/login.svg'),
-                      ),
-                      SizedBox(height: kDefaultVerticalPadding * 2),
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            CustomTextField(
-                              hintText: 'Email Address',
-                              controller: _emailController,
-                              icon: Icons.alternate_email,
-                              validator: MultiValidator([
-                                RequiredValidator(errorText: "Required"),
-                                EmailValidator(errorText: "Enter valid email"),
-                              ]),
-                            ),
-                            SizedBox(height: kDefaultVerticalPadding),
-                            PasswordField(
-                              hintText: 'Password',
-                              controller: _passwordController,
-                              validator: MultiValidator([
-                                RequiredValidator(errorText: "Required"),
-                                MinLengthValidator(6,
-                                    errorText:
-                                        "Password should be atleast 6 characters"),
-                                MaxLengthValidator(15,
-                                    errorText:
-                                        "Password should not be greater than 15 characters")
-                              ]),
-                            ),
-                            SizedBox(height: kDefaultVerticalPadding),
-                            BlocBuilder<LoginBloc, LoginState>(
-                              builder: (context, state) {
-                                if (state is LoginLoading) {
-                                  return RoundedCornerButton(
-                                    onPressed: () {},
-                                    backgroundColor: kOxfordBlueColor,
-                                    loadingWidget: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: kDefaultVerticalPadding * 0.5,
-                                        horizontal:
-                                            kDefaultHorizontalPadding / 2,
-                                      ),
-                                      child: const CircularProgressIndicator(
-                                        strokeWidth: 3,
-                                        color: kPlatinumColor,
-                                      ),
-                                    ),
-                                  );
-                                }
-                                return RoundedCornerButton(
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      _loginButtonPressed();
-                                    }
-                                  },
-                                  backgroundColor: kOxfordBlueColor,
-                                  textColor: kPlatinumColor,
-                                  label: 'LOG IN',
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: kDefaultVerticalPadding * 2),
-                      LabeledButton(
-                        text: 'Don\'t have an account? ',
-                        buttonLabel: 'Sign Up',
-                        onButtonPressed: () {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            RegistrationScreen.routeName,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.99,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: kDefaultVerticalPadding,
+                horizontal: kDefaultHorizontalPadding,
               ),
-            );
-          },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: kDefaultVerticalPadding * 2),
+                  Text(
+                    'Login',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline2!
+                        .copyWith(color: kOxfordBlueColor),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: kDefaultVerticalPadding * 2),
+                  AspectRatio(
+                    aspectRatio: ResponsiveDesign(context).getAspectRatio(),
+                    child: SvgPicture.asset('assets/images/login.svg'),
+                  ),
+                  SizedBox(height: kDefaultVerticalPadding * 2),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        CustomTextField(
+                          hintText: 'Email Address',
+                          controller: _emailController,
+                          icon: Icons.alternate_email,
+                          validator: MultiValidator([
+                            RequiredValidator(errorText: "Required"),
+                            EmailValidator(errorText: "Enter valid email"),
+                          ]),
+                        ),
+                        SizedBox(height: kDefaultVerticalPadding),
+                        PasswordField(
+                          hintText: 'Password',
+                          controller: _passwordController,
+                          validator: MultiValidator([
+                            RequiredValidator(errorText: "Required"),
+                            MinLengthValidator(6,
+                                errorText:
+                                    "Password should be atleast 6 characters"),
+                            MaxLengthValidator(15,
+                                errorText:
+                                    "Password should not be greater than 15 characters")
+                          ]),
+                        ),
+                        SizedBox(height: kDefaultVerticalPadding),
+                        BlocBuilder<LoginBloc, LoginState>(
+                          builder: (context, state) {
+                            if (state is LoginLoading) {
+                              return RoundedCornerButton(
+                                onPressed: () {},
+                                backgroundColor: kOxfordBlueColor,
+                                loadingWidget: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: kDefaultVerticalPadding * 0.5,
+                                    horizontal: kDefaultHorizontalPadding / 2,
+                                  ),
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: kPlatinumColor,
+                                  ),
+                                ),
+                              );
+                            }
+                            return RoundedCornerButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  _loginButtonPressed();
+                                }
+                              },
+                              backgroundColor: kOxfordBlueColor,
+                              textColor: kPlatinumColor,
+                              label: 'LOG IN',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: kDefaultVerticalPadding * 2),
+                  LabeledButton(
+                    text: 'Don\'t have an account? ',
+                    buttonLabel: 'Sign Up',
+                    onButtonPressed: () {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        RegistrationScreen.routeName,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

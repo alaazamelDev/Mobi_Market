@@ -30,13 +30,6 @@ const List<String> productCategoriesList = [
   'Other'
 ];
 
-List<Category> categories = [
-  Category(id: 1, name: 'Fashion'),
-  Category(id: 2, name: 'Home & Decore'),
-  Category(id: 3, name: 'Electronics'),
-  Category(id: 4, name: 'Food'),
-];
-
 List<User> users = [
   User(id: 1, name: 'Alaa Zamel', email: 'alaa.zamel80@gmail.com'),
   User(id: 2, name: 'Fares Dabbas', email: 'fares.dabbas@gmail.com'),
@@ -45,64 +38,15 @@ List<User> users = [
   User(id: 5, name: 'Touka Ramadan', email: 'touka.ramadan@gmail.com'),
 ];
 
-List<Product> productsList = [
-  Product(
-    id: 1,
-    name: 'iPhone 13 pro',
-    price: 1240.0,
-    imageUrl:
-        'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-4.jpg',
-    expiryDate: '2024-10-05T07:48:00.000Z',
-    category: categories[2],
-    phoneNumber: '+963991146587',
-    quantity: 15,
-    owner: users[1],
-  ),
-  Product(
-    id: 2,
-    name: 'Samsung S21 Ultra',
-    price: 200.0,
-    imageUrl:
-        'https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s21-ultra-5g-4.jpg',
-    expiryDate: '2024-10-05T07:48:00.000Z',
-    category: categories[2],
-    phoneNumber: '+963948821379',
-    quantity: 8,
-    owner: users[3],
-  ),
-  Product(
-    id: 3,
-    name: 'Addidas Shoes',
-    price: 840.0,
-    imageUrl:
-        'https://images.unsplash.com/photo-1562183241-b937e95585b6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=465&q=80',
-    expiryDate: '2025-10-05T07:48:00.000Z',
-    category: categories[1],
-    phoneNumber: '+963948821379',
-    quantity: 7,
-    owner: users[4],
-  ),
-  Product(
-    id: 4,
-    name: 'Sony Xperia Pro I',
-    price: 999.0,
-    imageUrl:
-        'https://fdn.gsmarena.com/imgroot/reviews/21/sony-xperia-pro-i/preview/lifestyle/-1024w2/gsmarena_006.jpg',
-    expiryDate: '2023-02-13T07:48:00.000Z',
-    category: categories[2],
-    phoneNumber: '+963947804651',
-    quantity: 23,
-    owner: users[2],
-  ),
-  Product(
-    id: 5,
-    name: 'iPhone 12 Pro',
-    price: 1099.0,
-    imageUrl: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-4.jpg',
-    expiryDate: '2024-10-05T07:48:00.000Z',
-    category: categories[2],
-    phoneNumber: '+963948821379',
-    quantity: 37,
-    owner: users[1],
-  ),
+List<Category> categoriesList = [
+  Category(id: 1, name: "Camilla Abbott III"),
+  Category(id: 2, name: "Elsa Auer"),
+  Category(id: 3, name: "Samson Howe MD"),
+  Category(id: 4, name: "Mrs. Bella Miller"),
+  Category(id: 5, name: "Kody Murazik"),
+  Category(id: 6, name: "Anthony Armstrong"),
+  Category(id: 7, name: "Dr. Bailey McDermott"),
+  Category(id: 8, name: "Lea Abbott"),
+  Category(id: 9, name: "Mariela Balistreri"),
+  Category(id: 10, name: "Rodrick Dibbert"),
 ];

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:products_management/constants/constants.dart';
 
-
 class ProductInfoRow extends StatelessWidget {
   const ProductInfoRow({
     Key? key,
@@ -23,12 +22,17 @@ class ProductInfoRow extends StatelessWidget {
               .bodyText2!
               .copyWith(fontWeight: FontWeight.bold),
         ),
-        Text(
-          content,
-          style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                fontWeight: FontWeight.bold,
-                color: kBdazzledBlueColor,
-              ),
+        SizedBox(width: kDefaultHorizontalPadding * 1.25),
+        Flexible(
+          child: Text(
+            content,
+            textAlign: TextAlign.justify,
+            style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: kBdazzledBlueColor,
+                  overflow: TextOverflow.fade,
+                ),
+          ),
         ),
       ],
     );

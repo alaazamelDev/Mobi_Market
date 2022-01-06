@@ -1,79 +1,79 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 
 import 'package:products_management/data/models/models.dart';
 
 /// * This class represents a single product model ///
 class Product {
-  int id;
-  String name;
-  double price;
-  String imageUrl;
-  String expiryDate;
-  Category category;
-  String phoneNumber;
-  int quantity;
-  User owner;
+  int? id;
+  String? name;
+  double? price;
+  String? image_url;
+  String? exp_date;
+  int? category_id;
+  String? phone_number;
+  String? description;
+  int? quantity;
+  int? reviews_count;
+  int? views;
+  int? user_id;
+  double? new_price;
+  List<Review>? reviews;
+  List<Discount>? discount_list;
   Product({
-    required this.id,
-    required this.name,
-    required this.price,
-    required this.imageUrl,
-    required this.expiryDate,
-    required this.category,
-    required this.phoneNumber,
-    required this.quantity,
-    required this.owner,
+    this.id,
+    this.name,
+    this.price,
+    this.image_url,
+    this.exp_date,
+    this.category_id,
+    this.phone_number,
+    this.description,
+    this.quantity,
+    this.reviews_count,
+    this.views,
+    this.user_id,
+    this.new_price,
+    this.reviews,
+    this.discount_list,
   });
-
-  Product copyWith({
-    int? id,
-    String? name,
-    double? price,
-    String? imageUrl,
-    String? expiryDate,
-    Category? category,
-    String? phoneNumber,
-    int? quantity,
-    User? owner,
-  }) {
-    return Product(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      price: price ?? this.price,
-      imageUrl: imageUrl ?? this.imageUrl,
-      expiryDate: expiryDate ?? this.expiryDate,
-      category: category ?? this.category,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      owner: owner ?? this.owner,
-      quantity: quantity ?? this.quantity,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
-      'price': price,
-      'imageUrl': imageUrl,
-      'expiryDate': expiryDate,
-      'category': category.toMap(),
-      'phoneNumber': phoneNumber,
-      'quantity': quantity,
-      'owner': owner.toMap(),
+      'image_url': image_url,
+      'price': price!.toString(),
+      'phone_number': phone_number,
+      'exp_date': exp_date, // send date in ISO 8601 Format
+      'description': description,
+      'quantity': quantity.toString(),
+      'category_id': category_id.toString(),
+      'views': views.toString(),
+      'discount_list': jsonEncode(
+        discount_list!.map((discount) => discount.toMap()).toList(),
+      ),
     };
   }
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
-      id: map['id']?.toInt() ?? 0,
-      name: map['name'] ?? '',
-      price: map['price']?.toDouble() ?? 0.0,
-      imageUrl: map['imageUrl'] ?? '',
-      expiryDate: map['expiryDate'] ?? '',
-      category: Category.fromMap(map['category']),
-      phoneNumber: map['phoneNumber'] ?? '',
-      quantity: map['quantity']?.toInt() ?? 0,
-      owner: User.fromMap(map['owner']),
+      id: map['id']?.toInt(),
+      name: map['name'],
+      price: map['price']?.toDouble(),
+      image_url: map['image_url'],
+      exp_date: map['exp_date'],
+      category_id: map['category_id']?.toInt(),
+      phone_number: map['phone_number'],
+      description: map['description'],
+      quantity: map['quantity']?.toInt(),
+      reviews_count: map['reviews_count']?.toInt(),
+      views: map['views']?.toInt(),
+      new_price: map['new_price']?.toDouble(),
+      reviews: map['reviews']
+              .map<Review>((review) => Review.fromMap(review))
+              .toList() ??
+          [],
     );
   }
 
@@ -84,7 +84,7 @@ class Product {
 
   @override
   String toString() {
-    return 'Product(id: $id, name: $name, price: $price, imageUrl: $imageUrl, expiryDate: $expiryDate, category: $category, phoneNumber: $phoneNumber, quantity: $quantity, owner: $owner)';
+    return 'Product(id: $id, name: $name, price: $price, imageUrl: $image_url, expiryDate: $exp_date, category_id: $category_id, phoneNumber: $phone_number, description: $description, quantity: $quantity, reviewsCount: $reviews_count, views: $views, newPrice: $new_price, reviews: $reviews )';
   }
 
   @override
@@ -95,12 +95,16 @@ class Product {
         other.id == id &&
         other.name == name &&
         other.price == price &&
-        other.imageUrl == imageUrl &&
-        other.expiryDate == expiryDate &&
-        other.category == category &&
-        other.phoneNumber == phoneNumber &&
+        other.image_url == image_url &&
+        other.exp_date == exp_date &&
+        other.category_id == category_id &&
+        other.phone_number == phone_number &&
+        other.description == description &&
         other.quantity == quantity &&
-        other.owner == owner;
+        other.reviews_count == reviews_count &&
+        other.views == views &&
+        other.new_price == new_price &&
+        other.reviews == reviews;
   }
 
   @override
@@ -108,11 +112,15 @@ class Product {
     return id.hashCode ^
         name.hashCode ^
         price.hashCode ^
-        imageUrl.hashCode ^
-        expiryDate.hashCode ^
-        category.hashCode ^
-        phoneNumber.hashCode ^
+        image_url.hashCode ^
+        exp_date.hashCode ^
+        category_id.hashCode ^
+        phone_number.hashCode ^
+        description.hashCode ^
         quantity.hashCode ^
-        owner.hashCode;
+        reviews_count.hashCode ^
+        views.hashCode ^
+        new_price.hashCode ^
+        reviews.hashCode;
   }
 }

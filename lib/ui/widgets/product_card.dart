@@ -34,7 +34,7 @@ class ProductCard extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Image.network(
-              product.imageUrl,
+              product.image_url!,
               fit: BoxFit.cover,
             ),
           ),
@@ -53,7 +53,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    product.name,
+                    product.name!,
                     style: Theme.of(context).textTheme.bodyText1!.copyWith(
                         color: kBdazzledBlueColor, fontWeight: FontWeight.w500),
                   ),

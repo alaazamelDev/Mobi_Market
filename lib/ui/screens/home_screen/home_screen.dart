@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:products_management/logic/logout/logout_bloc.dart';
+import 'package:products_management/logic/product/product_bloc.dart';
 import 'package:products_management/ui/screens/add_product_screen/add_product_screen.dart';
 import 'package:products_management/constants/constants.dart';
 import 'package:products_management/ui/screens/screens.dart';
@@ -40,7 +42,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // warning dialog before cancel insertion
   void showWarningDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -92,6 +93,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<ProductBloc>().add(const GetAllProducts());
     return Scaffold(
       appBar: MainAppBar(
         title: 'STORE',
@@ -124,60 +126,116 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: FlattedButton(
-                  title: 'Filter',
-                  icon: Icons.filter_list_rounded,
-                  onPressed: () {},
+      body: BlocConsumer<ProductBloc, ProductState>(
+        listener: (_, state) {
+          if (state is ProductInsertionSucceeded) {
+            // when new product is inserted we need to fetch the products
+            context.read<ProductBloc>().add(const GetAllProducts());
+          }
+        },
+        builder: (context, state) {
+          // When data is loaded, show the loaded data in gridview
+          if (state is ProductLoaded) {
+            if (state.products!.isEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 2.5,
+                    child: SvgPicture.asset('assets/images/no_data.svg'),
+                  ),
+                  SizedBox(height: kDefaultVerticalPadding),
+                  Text(
+                    'No data was found!',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                ],
+              );
+            }
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: FlattedButton(
+                        title: 'Filter',
+                        icon: Icons.filter_list_rounded,
+                        onPressed: () {},
+                      ),
+                    ),
+                    Expanded(
+                      child: FlattedButton(
+                        title: 'Sort by',
+                        icon: Icons.sort_rounded,
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              Expanded(
-                child: FlattedButton(
-                  title: 'Sort by',
-                  icon: Icons.sort_rounded,
-                  onPressed: () {},
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: kDefaultHorizontalPadding * 0.4,
+                      vertical: kDefaultVerticalPadding * 0.4,
+                    ),
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.5,
+                        mainAxisSpacing: kDefaultHorizontalPadding * 0.4,
+                        crossAxisSpacing: kDefaultVerticalPadding * 0.4,
+                      ),
+                      itemCount: state.products!.length,
+                      itemBuilder: (context, index) {
+                        return ProductCard(
+                          product: state.products![index],
+                          onCardPressed: () {
+                            // todo: move to details screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => DetailsScreen(
+                                  product: state.products![index],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                )
+              ],
+            );
+          }
+          if (state is ProductLoadFailure) {
+            // When no data is found or no internet or any exception happen
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AspectRatio(
+                  aspectRatio: 2.5,
+                  child: SvgPicture.asset('assets/images/no_data.svg'),
                 ),
-              ),
-            ],
-          ),
-          Flexible(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: kDefaultHorizontalPadding * 0.4,
-                vertical: kDefaultVerticalPadding * 0.4,
-              ),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.5,
-                  mainAxisSpacing: kDefaultHorizontalPadding * 0.4,
-                  crossAxisSpacing: kDefaultVerticalPadding * 0.4,
+                SizedBox(height: kDefaultVerticalPadding),
+                Text(
+                  'No data was found!',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline5,
                 ),
-                itemCount: productsList.length,
-                itemBuilder: (context, index) {
-                  return ProductCard(
-                    product: productsList[index],
-                    onCardPressed: () {
-                      // todo: move to details screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DetailsScreen(
-                            product: productsList[index],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+              ],
+            );
+          }
+          // While loading show cirular progress indicator
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kRichBlackColor,
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

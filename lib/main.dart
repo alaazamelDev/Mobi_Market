@@ -7,11 +7,15 @@ import 'package:products_management/constants/colors.dart';
 import 'package:products_management/constants/route_config.dart';
 import 'package:products_management/constants/theme.dart';
 import 'package:products_management/data/repositories/auth_repository.dart';
+import 'package:products_management/data/repositories/category_repository.dart';
+import 'package:products_management/data/repositories/product_repository.dart';
 import 'package:products_management/data/repositories/shared_prefs_repository.dart';
 import 'package:products_management/logic/auth/auth_bloc.dart';
 import 'package:products_management/logic/login/login_bloc.dart';
 import 'package:products_management/logic/logout/logout_bloc.dart';
+import 'package:products_management/logic/product/product_bloc.dart';
 import 'package:products_management/logic/registration/registration_bloc.dart';
+import 'package:products_management/logic/upload/upload_bloc.dart';
 import 'package:products_management/ui/screens/screens.dart';
 
 void main() async {
@@ -30,10 +34,15 @@ void main() async {
   const FlutterSecureStorage storage = FlutterSecureStorage();
   final AuthRepository authRepository = AuthRepository(storage);
   final SharedPrefsRepository prefsRepository = SharedPrefsRepository(storage);
+  var categoryRepository = CategoryRepository(prefsRepository);
+  var productRepository = ProductRepository(prefsRepository: prefsRepository);
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(
-        create: (_) => AuthBloc(authRepository)..add(AppStarted()),
+        create: (_) => AuthBloc(
+          authRepository,
+          categoryRepository,
+        )..add(AppStarted()),
       ),
       BlocProvider(
         create: (context) => LoginBloc(
@@ -53,7 +62,17 @@ void main() async {
           authRepository: authRepository,
           authBloc: context.read<AuthBloc>(),
         ),
-      )
+      ),
+      BlocProvider(
+        create: (context) => ProductBloc(
+          ProductRepository(
+            prefsRepository: prefsRepository,
+          ),
+        ),
+      ),
+      BlocProvider(
+        create: (context) => UploadBloc(productRepository),
+      ),
     ],
     child: MyApp(authRepository: authRepository),
   ));
