@@ -269,6 +269,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       onCategorySelected: (categoryID) {
                         setState(() {
                           // assign the selected category id to the public variable
+                          print(categoryID);
                           _category = categoryID!;
                         });
                       },

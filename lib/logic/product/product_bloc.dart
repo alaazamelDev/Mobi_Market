@@ -9,7 +9,7 @@ part 'product_state.dart';
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductRepository productRepository;
 
-  ProductBloc(this.productRepository) : super(ProductInitialized()) {
+  ProductBloc(this.productRepository) : super(ProductLoading()) {
     // fetch prodcuts from api
     on<GetAllProducts>((event, emit) async {
       emit(ProductLoading());
@@ -21,7 +21,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(ProductLoaded(products));
       }
     });
-    
+
     // this event is called when we are ready to submit the product to the api
     on<ConfirmProductInsertion>((event, emit) async {
       emit(ProductLoading());
@@ -30,6 +30,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(const ProductInsertionFaliure('Error while inserting a product'));
       } else {
         emit(ProductInsertionSucceeded());
+      }
+    });
+
+    // this event is called to delete a product from database
+    on<DeleteProduct>((event, emit) async {
+      emit(ProductLoading());
+      bool isDone = await productRepository.deleteProudct(event.productID);
+      if (!isDone) {
+        emit(ProductDeletetionFaliure());
+      } else {
+        emit(ProductDeletetionSucceeded());
       }
     });
   }

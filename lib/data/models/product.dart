@@ -17,6 +17,7 @@ class Product {
   int? quantity;
   int? reviews_count;
   int? views;
+  bool? is_editable;
   int? user_id;
   double? new_price;
   List<Review>? reviews;
@@ -31,6 +32,7 @@ class Product {
     this.phone_number,
     this.description,
     this.quantity,
+    this.is_editable,
     this.reviews_count,
     this.views,
     this.user_id,
@@ -69,6 +71,7 @@ class Product {
       quantity: map['quantity']?.toInt(),
       reviews_count: map['reviews_count']?.toInt(),
       views: map['views']?.toInt(),
+      is_editable: map['is_editable'],
       new_price: map['new_price']?.toDouble(),
       reviews: map['reviews']
               .map<Review>((review) => Review.fromMap(review))

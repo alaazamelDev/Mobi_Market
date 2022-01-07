@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:products_management/logic/logout/logout_bloc.dart';
 import 'package:products_management/logic/product/product_bloc.dart';
 import 'package:products_management/ui/screens/add_product_screen/add_product_screen.dart';
 import 'package:products_management/constants/constants.dart';
 import 'package:products_management/ui/screens/screens.dart';
+import 'package:products_management/ui/widgets/notfound_card.dart';
 import 'package:products_management/ui/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -128,7 +128,8 @@ class HomeScreen extends StatelessWidget {
       ),
       body: BlocConsumer<ProductBloc, ProductState>(
         listener: (_, state) {
-          if (state is ProductInsertionSucceeded) {
+          if (state is ProductInsertionSucceeded ||
+              state is ProductDeletetionSucceeded) {
             // when new product is inserted we need to fetch the products
             context.read<ProductBloc>().add(const GetAllProducts());
           }
@@ -137,21 +138,8 @@ class HomeScreen extends StatelessWidget {
           // When data is loaded, show the loaded data in gridview
           if (state is ProductLoaded) {
             if (state.products!.isEmpty) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 2.5,
-                    child: SvgPicture.asset('assets/images/no_data.svg'),
-                  ),
-                  SizedBox(height: kDefaultVerticalPadding),
-                  Text(
-                    'No data was found!',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                ],
+              return const NotFoundCard(
+                title: 'No data was found!',
               );
             }
             return Column(
@@ -212,22 +200,9 @@ class HomeScreen extends StatelessWidget {
           }
           if (state is ProductLoadFailure) {
             // When no data is found or no internet or any exception happen
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: 2.5,
-                  child: SvgPicture.asset('assets/images/no_data.svg'),
-                ),
-                SizedBox(height: kDefaultVerticalPadding),
-                Text(
-                  'No data was found!',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              ],
-            );
+            return const NotFoundCard(
+                title:
+                    'An error occured while loading data.\nplease try again later');
           }
           // While loading show cirular progress indicator
           return const Center(

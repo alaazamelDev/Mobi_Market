@@ -119,4 +119,32 @@ class ProductsContentProvider {
 
     return null;
   }
+
+/*
+ * This function is responsible for deleteting the product with id 
+ * productID 
+ */
+  Future<bool> deleteProduct({
+    required int productID,
+    required String token,
+  }) async {
+    http.Response response;
+    try {
+      // pass data in request body of post request method
+      response = await http.delete(
+        Uri.parse(_apiRootURL + _productsPath + '/$productID'),
+        headers: {
+          _acceptKey: _acceptValue,
+          _authorizationKey: _bearer + token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (ex) {
+      return false;
+    }
+    return false;
+  }
 }

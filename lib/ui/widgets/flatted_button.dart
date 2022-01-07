@@ -7,10 +7,12 @@ class FlattedButton extends StatelessWidget {
     required this.title,
     this.icon,
     required this.onPressed,
+    this.backgroundColor,
   }) : super(key: key);
   final String title;
   final IconData? icon;
   final Function() onPressed;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +24,25 @@ class FlattedButton extends StatelessWidget {
             width: 1,
           ),
         ),
+        backgroundColor: backgroundColor,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: kShadowBlueColor,
-          ),
+          icon != null
+              ? Icon(
+                  icon,
+                  color: kShadowBlueColor,
+                )
+              : const SizedBox(),
           SizedBox(width: kDefaultHorizontalPadding / 2),
           Text(
             title,
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1!
-                .copyWith(color: kShadowBlueColor, fontWeight: FontWeight.w400),
+            style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                  color:
+                      backgroundColor != null ? Colors.white : kShadowBlueColor,
+                  fontWeight: FontWeight.w400,
+                ),
           ),
         ],
       ),

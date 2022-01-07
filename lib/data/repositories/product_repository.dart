@@ -68,4 +68,20 @@ class ProductRepository {
 
     return imageUrl;
   }
+
+  Future<bool> deleteProudct(int id) async {
+    String? token = await _prefsRepository.getAccessToken();
+
+    // if usser is not registered don't delete an item
+    if (token == null) {
+      return false;
+    }
+
+    final isDone = await _productsProvider.deleteProduct(
+      token: token,
+      productID: id,
+    );
+
+    return isDone;
+  }
 }
