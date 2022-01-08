@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:products_management/data/content_providers/products_content_provider.dart';
 import 'package:products_management/data/models/models.dart';
+import 'package:products_management/data/models/sort_type_enum.dart';
 import 'package:products_management/data/repositories/shared_prefs_repository.dart';
 
 class ProductRepository {
@@ -11,14 +12,46 @@ class ProductRepository {
       : _prefsRepository = prefsRepository,
         _productsProvider = ProductsContentProvider();
 
-  Future<List<Product>?> getAllProucts() async {
+  Future<List<Product>?> getAllProucts({SortType? sortBy}) async {
+    String? token = await _prefsRepository.getAccessToken();
+
+    if (token == null) {
+      return null;
+    }
+    var jsonProducts;
+    if (sortBy != null) {
+      // implement sort by field request
+      jsonProducts = await _productsProvider.getAllProducts(
+        token: token,
+        sortBy: sortBy,
+      );
+    } else {
+      jsonProducts = await _productsProvider.getAllProducts(token: token);
+    }
+
+    if (jsonProducts == null) {
+      return null;
+    }
+
+    List<Product> products = [];
+    print(jsonProducts); //todo: remove this
+    for (var product in jsonProducts) {
+      products.add(Product.fromMap(product));
+    }
+    return products;
+  }
+
+  Future<List<Product>?> search({required String query}) async {
     String? token = await _prefsRepository.getAccessToken();
 
     if (token == null) {
       return null;
     }
 
-    final jsonProducts = await _productsProvider.getAllProducts(token);
+    final jsonProducts = await _productsProvider.search(
+      accessToken: token,
+      query: query,
+    );
 
     if (jsonProducts == null) {
       return null;

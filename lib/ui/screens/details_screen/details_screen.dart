@@ -257,7 +257,7 @@ class DetailsScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    '\$${product!.price}',
+                                    '\$${product!.new_price}',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline3!

@@ -7,7 +7,6 @@ import 'package:products_management/constants/colors.dart';
 import 'package:products_management/constants/route_config.dart';
 import 'package:products_management/constants/theme.dart';
 import 'package:products_management/data/repositories/auth_repository.dart';
-import 'package:products_management/data/repositories/category_repository.dart';
 import 'package:products_management/data/repositories/product_repository.dart';
 import 'package:products_management/data/repositories/shared_prefs_repository.dart';
 import 'package:products_management/logic/auth/auth_bloc.dart';
@@ -34,14 +33,12 @@ void main() async {
   const FlutterSecureStorage storage = FlutterSecureStorage();
   final AuthRepository authRepository = AuthRepository(storage);
   final SharedPrefsRepository prefsRepository = SharedPrefsRepository(storage);
-  var categoryRepository = CategoryRepository(prefsRepository);
   var productRepository = ProductRepository(prefsRepository: prefsRepository);
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(
         create: (_) => AuthBloc(
           authRepository,
-          categoryRepository,
         )..add(AppStarted()),
       ),
       BlocProvider(

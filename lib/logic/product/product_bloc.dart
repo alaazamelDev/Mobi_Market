@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:products_management/data/models/models.dart';
+import 'package:products_management/data/models/sort_type_enum.dart';
 import 'package:products_management/data/repositories/product_repository.dart';
 
 part 'product_event.dart';
@@ -13,7 +14,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     // fetch prodcuts from api
     on<GetAllProducts>((event, emit) async {
       emit(ProductLoading());
-      List<Product>? products = await productRepository.getAllProucts();
+      List<Product>? products =
+          await productRepository.getAllProucts(sortBy: event.sortType);
       if (products == null) {
         emit(const ProductLoadFailure('Error while fetching products'));
       } else {
@@ -88,6 +90,19 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
             'Error while adding a review on the product'));
       } else {
         emit(ProductReviewInsertionSucceeded());
+      }
+    });
+
+    on<SearchProduct>((event, emit) async {
+      // fetch prodcuts from api
+      emit(ProductLoading());
+      List<Product>? products =
+          await productRepository.search(query: event.query);
+      if (products == null) {
+        emit(const ProductLoadFailure('Error while fetching products'));
+      } else {
+        // When data is loaded, send them back to UI
+        emit(ProductLoaded(products));
       }
     });
   }

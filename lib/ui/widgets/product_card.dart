@@ -14,62 +14,85 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(1, 1),
-            spreadRadius: 1.5,
-            color: Colors.grey.withOpacity(0.12),
-          ),
-        ],
-        borderRadius: BorderRadius.circular(4),
-      ),
-      height: ResponsiveDesign(context).getHeight() * 0.35,
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Image.network(
-              product.image_url!,
-              fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: onCardPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              offset: const Offset(1, 1),
+              spreadRadius: 2,
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 1,
             ),
-          ),
-          Expanded(
-            child: Padding(
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Image.network(
+                product.image_url!,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            ),
+            Padding(
               padding: EdgeInsets.all(kDefaultHorizontalPadding * 0.4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(
-                    '\$${product.price}',
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: kRichBlackColor,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.name!,
+                          style:
+                              Theme.of(context).textTheme.headline6!.copyWith(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: kRichBlackColor,
+                                  ),
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '\$${product.new_price}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(
+                                  color: kBdazzledBlueColor,
+                                  fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.name!,
-                    style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                        color: kBdazzledBlueColor, fontWeight: FontWeight.w500),
+                  const SizedBox(width: 4),
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.visibility_outlined,
+                        color: kBdazzledBlueColor,
+                      ),
+                      SizedBox(height: kDefaultHorizontalPadding * 0.3),
+                      Text(
+                        product.views.toString(),
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-          SizedBox(
-            height: 40,
-            child: FlattedButton(
+            FlattedButton(
               onPressed: onCardPressed,
               title: 'Show Details',
               icon: Icons.info_outline_rounded,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

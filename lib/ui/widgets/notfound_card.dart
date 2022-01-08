@@ -6,8 +6,10 @@ class NotFoundCard extends StatelessWidget {
   const NotFoundCard({
     Key? key,
     required this.title,
+    this.imageSource,
   }) : super(key: key);
   final String title;
+  final String? imageSource;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class NotFoundCard extends StatelessWidget {
       children: [
         AspectRatio(
           aspectRatio: 2.5,
-          child: SvgPicture.asset('assets/images/no_data.svg'),
+          child: SvgPicture.asset(imageSource ?? 'assets/images/no_data.svg'),
         ),
         SizedBox(height: kDefaultVerticalPadding),
         Text(

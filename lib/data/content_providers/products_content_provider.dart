@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:products_management/data/models/models.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:products_management/data/models/sort_type_enum.dart';
 import 'package:products_management/logic/product/product_bloc.dart';
 
 class ProductsContentProvider {
@@ -24,12 +25,63 @@ class ProductsContentProvider {
   // Bearer word for authorization header
   static const _bearer = 'Bearer ';
 
-  Future getAllProducts(String accessToken) async {
+  Future getAllProducts({required String token, SortType? sortBy}) async {
+    http.Response response;
+    String sortType;
+    switch (sortBy) {
+      case SortType.nameSort:
+        sortType = 'name';
+        break;
+      case SortType.priceSort:
+        sortType = 'price';
+        break;
+      case SortType.categorySort:
+        sortType = 'category_id';
+        break;
+      case SortType.quantitySort:
+        sortType = 'quantity';
+        break;
+      case SortType.expDateSort:
+        sortType = 'exp_date';
+        break;
+      default:
+        sortType = '';
+    }
+    try {
+      if (sortType != '') {
+        // pass data in request body of post request method
+        response = await http.get(
+          Uri.parse(_apiRootURL + _productsPath + '?sort_by=$sortType'),
+          headers: {
+            _acceptKey: _acceptValue,
+            _authorizationKey: _bearer + token,
+          },
+        );
+      } else {
+        // pass data in request body of post request method
+        response = await http.get(
+          Uri.parse(_apiRootURL + _productsPath),
+          headers: {
+            _acceptKey: _acceptValue,
+            _authorizationKey: _bearer + token,
+          },
+        );
+      }
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['data'];
+      }
+    } catch (ex) {
+      return null;
+    }
+  }
+
+  Future search({required String accessToken, required String query}) async {
     http.Response response;
     try {
       // pass data in request body of post request method
       response = await http.get(
-        Uri.parse(_apiRootURL + _productsPath),
+        Uri.parse(_apiRootURL + _productsPath + '?query=$query'),
         headers: {
           _acceptKey: _acceptValue,
           _authorizationKey: _bearer + accessToken,

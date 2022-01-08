@@ -31,7 +31,8 @@ class UpdateProduct extends ProductEvent {
 }
 
 class GetAllProducts extends ProductEvent {
-  const GetAllProducts();
+  final SortType? sortType;
+  const GetAllProducts({this.sortType});
 }
 
 class IncreaseViews extends ProductEvent {
@@ -54,4 +55,9 @@ class AddReview extends ProductEvent {
     required this.content,
     required this.productID,
   });
+}
+
+class SearchProduct extends ProductEvent {
+  final String query;
+  const SearchProduct({required this.query});
 }

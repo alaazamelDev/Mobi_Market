@@ -488,18 +488,28 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 ),
                               ),
                             ),
-
+                            SizedBox(height: kDefaultVerticalPadding / 2),
                             // Add new Discount button
-                            FlattedButton(
-                              title: '',
-                              icon: Icons.add_rounded,
-                              onPressed: () {
-                                setState(() {
-                                  // add new discount category
-                                  discountList.add(Discount());
-                                });
-                              },
-                            ),
+                            TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    // add new discount category
+                                    discountList.add(Discount());
+                                  });
+                                },
+                                style: TextButton.styleFrom(
+                                  elevation: 1,
+                                  backgroundColor: kPlatinumColor,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: kDefaultVerticalPadding * 0.25,
+                                  ),
+                                  child: const Center(
+                                    child: Icon(Icons.add,
+                                        color: kBdazzledBlueColor),
+                                  ),
+                                ))
                           ],
                         ),
                       ),
