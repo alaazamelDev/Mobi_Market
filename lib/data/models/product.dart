@@ -19,6 +19,8 @@ class Product {
   int? views;
   bool? is_editable;
   int? user_id;
+  int? likes_count;
+  bool? liked;
   double? new_price;
   List<Review>? reviews;
   List<Discount>? discount_list;
@@ -36,7 +38,9 @@ class Product {
     this.reviews_count,
     this.views,
     this.user_id,
+    this.liked,
     this.new_price,
+    this.likes_count,
     this.reviews,
     this.discount_list,
   });
@@ -51,7 +55,6 @@ class Product {
       'description': description,
       'quantity': quantity.toString(),
       'category_id': category_id.toString(),
-      'views': views.toString(),
       'discount_list': jsonEncode(
         discount_list!.map((discount) => discount.toMap()).toList(),
       ),
@@ -71,10 +74,16 @@ class Product {
       quantity: map['quantity']?.toInt(),
       reviews_count: map['reviews_count']?.toInt(),
       views: map['views']?.toInt(),
+      liked: map['liked'],
+      likes_count: map['likes_count'],
       is_editable: map['is_editable'],
       new_price: map['new_price']?.toDouble(),
       reviews: map['reviews']
               .map<Review>((review) => Review.fromMap(review))
+              .toList() ??
+          [],
+      discount_list: map['discounts']
+              .map<Discount>((discount) => Discount.fromMap(discount))
               .toList() ??
           [],
     );

@@ -1,7 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:products_management/data/models/models.dart';
 import 'package:products_management/logic/logout/logout_bloc.dart';
 import 'package:products_management/logic/product/product_bloc.dart';
-import 'package:products_management/ui/screens/add_product_screen/add_product_screen.dart';
+import 'package:products_management/ui/screens/add_product_screen/add_edit_product_screen.dart';
 import 'package:products_management/constants/constants.dart';
 import 'package:products_management/ui/screens/screens.dart';
 import 'package:products_management/ui/widgets/notfound_card.dart';
@@ -122,14 +123,19 @@ class HomeScreen extends StatelessWidget {
           ),
           StyledIconButton(
             icon: Icons.search_rounded,
-            onPressed: () {},
+            onPressed: () {
+              // show search scree
+              showSearch(context: context, delegate: SearchView());
+            },
           ),
         ],
       ),
       body: BlocConsumer<ProductBloc, ProductState>(
         listener: (_, state) {
           if (state is ProductInsertionSucceeded ||
-              state is ProductDeletetionSucceeded) {
+              state is ProductDeletetionSucceeded ||
+              state is ProductUpdateSucceeded ||
+              state is ProductLikeSucceeded) {
             // when new product is inserted we need to fetch the products
             context.read<ProductBloc>().add(const GetAllProducts());
           }
@@ -179,7 +185,10 @@ class HomeScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return ProductCard(
                           product: state.products![index],
-                          onCardPressed: () {
+                          onCardPressed: () async {
+                            // todo: increase views count
+                            context.read<ProductBloc>().add(IncreaseViews(
+                                productID: state.products![index].id!));
                             // todo: move to details screen
                             Navigator.push(
                               context,
@@ -212,6 +221,61 @@ class HomeScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class SearchView extends SearchDelegate {
+  final List<Product> suggesstionList = [];
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          // clear query field
+          query = '';
+        },
+        splashRadius: 20,
+        icon: const Icon(
+          Icons.clear,
+          color: kRichBlackColor,
+        ),
+      )
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      splashRadius: 20,
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // TODO: implement buildResults
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return ListView.builder(
+      itemCount: suggesstionList.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          leading: Text(
+            suggesstionList[index].name!,
+            style: Theme.of(context).textTheme.headline5,
+          ),
+        );
+      },
     );
   }
 }

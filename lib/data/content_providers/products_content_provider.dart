@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:products_management/data/models/models.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:products_management/logic/product/product_bloc.dart';
 
 class ProductsContentProvider {
   // URL data
@@ -10,6 +11,7 @@ class ProductsContentProvider {
   static const String _apiRootURL = 'http://192.168.1.106:8000/api';
   static const String _projectRootURL = 'http://192.168.1.106:8000';
   static const String _productsPath = '/products';
+  static const String _reviewsPath = '/reviews';
   static const String _imagePath = '/image';
 
   // Request Keys
@@ -46,8 +48,10 @@ class ProductsContentProvider {
   * This function is rsponsible for sending a post request with required data
   * to store the inserted product.
 */
-  Future<bool> addProduct(
-      {required String token, required Product product}) async {
+  Future<bool> addProduct({
+    required String token,
+    required Product product,
+  }) async {
     http.Response response;
     try {
       print(product.toMap());
@@ -144,6 +148,114 @@ class ProductsContentProvider {
       }
     } catch (ex) {
       return false;
+    }
+    return false;
+  }
+
+/*
+ * This function is responsible for updating the product with a new info
+`*/
+  Future<bool> updateProduct({
+    required Product product,
+    required String token,
+  }) async {
+    http.Response response;
+    try {
+      print(product.toMap());
+      print(product.id);
+      response = await http.put(
+        Uri.parse(_apiRootURL + _productsPath + '/${product.id}'),
+        headers: {
+          _acceptKey: _acceptValue,
+          _authorizationKey: _bearer + token,
+        },
+        // pass product data in body of request
+        body: product.toMap(),
+      );
+
+      print('status code: ${response.statusCode} body: ${response.body}');
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (ex) {
+      throw Exception(ex.toString());
+    }
+    return false;
+  }
+
+  Future<bool> increaseViews({
+    required int productID,
+    required String token,
+  }) async {
+    http.Response response;
+    try {
+      response = await http.put(
+        Uri.parse(_apiRootURL + _productsPath + '/$productID/views'),
+        headers: {
+          _acceptKey: _acceptValue,
+          _authorizationKey: _bearer + token,
+        },
+      );
+
+      print('status code: ${response.statusCode} body: ${response.body}');
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (ex) {
+      throw Exception(ex.toString());
+    }
+    return false;
+  }
+
+  Future<bool> likeProduct({
+    required int productID,
+    required String token,
+  }) async {
+    http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse(_apiRootURL + _productsPath + '/$productID/like'),
+        headers: {
+          _acceptKey: _acceptValue,
+          _authorizationKey: _bearer + token,
+        },
+      );
+
+      print('status code: ${response.statusCode} body: ${response.body}');
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (ex) {
+      throw Exception(ex.toString());
+    }
+    return false;
+  }
+
+  Future<bool> addReview({
+    required int productID,
+    required String content,
+    required String token,
+  }) async {
+    http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse(_apiRootURL + _reviewsPath),
+        headers: {
+          _acceptKey: _acceptValue,
+          _authorizationKey: _bearer + token,
+        },
+        body: {
+          'content': content,
+          'product_id': productID.toString(),
+        },
+      );
+
+      print('status code: ${response.statusCode} body: ${response.body}');
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (ex) {
+      throw Exception(ex.toString());
     }
     return false;
   }

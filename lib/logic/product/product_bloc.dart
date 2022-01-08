@@ -43,5 +43,52 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(ProductDeletetionSucceeded());
       }
     });
+
+    // This event is called when new data is updated for the product
+    on<UpdateProduct>((event, emit) async {
+      emit(ProductLoading());
+      bool isDone =
+          await productRepository.updateProduct(product: event.product);
+      if (!isDone) {
+        emit(const ProductUpdateFaliure('Error while updating the product'));
+      } else {
+        emit(ProductUpdateSucceeded());
+      }
+    });
+
+    on<IncreaseViews>((event, emit) async {
+      bool isDone =
+          await productRepository.increaseViews(productID: event.productID);
+      if (!isDone) {
+        emit(const ProductUpdateFaliure(
+            'Error while increasing views of the product'));
+      } else {
+        emit(ProductUpdateSucceeded());
+      }
+    });
+
+    on<LikeProduct>((event, emit) async {
+      bool isDone =
+          await productRepository.likeProduct(productID: event.productID);
+      if (!isDone) {
+        emit(const ProductUpdateFaliure(
+            'Error while performing like operation on the product'));
+      } else {
+        emit(ProductLikeSucceeded());
+      }
+    });
+
+    on<AddReview>((event, emit) async {
+      bool isDone = await productRepository.addReview(
+        productID: event.productID,
+        content: event.content,
+      );
+      if (!isDone) {
+        emit(const ProductReviewInsertionFailed(
+            'Error while adding a review on the product'));
+      } else {
+        emit(ProductReviewInsertionSucceeded());
+      }
+    });
   }
 }

@@ -9,7 +9,6 @@ abstract class ProductEvent extends Equatable {
   List<Object> get props => [];
 }
 
-
 // submit the data after validation, to be inserted
 class ConfirmProductInsertion extends ProductEvent {
   final Product product;
@@ -33,4 +32,26 @@ class UpdateProduct extends ProductEvent {
 
 class GetAllProducts extends ProductEvent {
   const GetAllProducts();
+}
+
+class IncreaseViews extends ProductEvent {
+  final int productID;
+
+  const IncreaseViews({required this.productID});
+}
+
+class LikeProduct extends ProductEvent {
+  final int productID;
+
+  const LikeProduct({required this.productID});
+}
+
+class AddReview extends ProductEvent {
+  final String content;
+  final int productID;
+
+  const AddReview({
+    required this.content,
+    required this.productID,
+  });
 }

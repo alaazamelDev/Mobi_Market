@@ -36,11 +36,10 @@ class Discount {
   }
 
   factory Discount.fromMap(Map<String, dynamic> map) {
+    
     return Discount(
       discount_percentage: map['discount_percentage']?.toDouble() ?? 0.0,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
-      product_id: map['product_id']?.toInt(),
-      numberOfDays: map['numnerOfDays']?.toInt(),
+      date: DateTime.parse(map['date']),
     );
   }
 

@@ -84,4 +84,72 @@ class ProductRepository {
 
     return isDone;
   }
+
+  Future<bool> updateProduct({required Product product}) async {
+    String? token = await _prefsRepository.getAccessToken();
+
+    // if usser is not registered don't store an item
+    if (token == null) {
+      return false;
+    }
+
+    final isDone = await _productsProvider.updateProduct(
+      token: token,
+      product: product, // pass new product data
+    );
+
+    return isDone;
+  }
+
+  Future<bool> increaseViews({required int productID}) async {
+    String? token = await _prefsRepository.getAccessToken();
+
+    // if usser is not registered don't store an item
+    if (token == null) {
+      return false;
+    }
+
+    final isDone = await _productsProvider.increaseViews(
+      token: token,
+      productID: productID,
+    );
+
+    return isDone;
+  }
+
+  Future<bool> likeProduct({required int productID}) async {
+    String? token = await _prefsRepository.getAccessToken();
+
+    // if usser is not registered don't store an item
+    if (token == null) {
+      return false;
+    }
+
+    final isDone = await _productsProvider.likeProduct(
+      token: token,
+      productID: productID,
+    );
+
+    return isDone;
+  }
+
+  Future<bool> addReview({
+    required int productID,
+    required String content,
+  }) async {
+    String? token = await _prefsRepository.getAccessToken();
+
+    // if usser is not registered don't store an item
+    if (token == null) {
+      return false;
+    }
+
+    final isDone = await _productsProvider.addReview(
+      token: token,
+      productID: productID,
+      content: content,
+    );
+
+    return isDone;
+  }
 }

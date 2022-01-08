@@ -45,10 +45,31 @@ class ProductDeletetionSucceeded extends ProductState {}
 
 class ProductDeletetionFaliure extends ProductState {}
 
+/*
+ * When product is updated successfully 
+ */
+class ProductUpdateSucceeded extends ProductState {}
+
+class ProductUpdateFaliure extends ProductState {
+  final String error;
+
+  const ProductUpdateFaliure(this.error);
+}
+
 // this occure when some error happen while fetching
 // products from server
 class ProductLoadFailure extends ProductState {
   final String error;
 
   const ProductLoadFailure(this.error);
+}
+
+class ProductLikeSucceeded extends ProductState {}
+
+class ProductReviewInsertionSucceeded extends ProductState {}
+
+class ProductReviewInsertionFailed extends ProductState {
+  final String error;
+
+  const ProductReviewInsertionFailed(this.error);
 }

@@ -14,13 +14,19 @@ import 'package:products_management/ui/widgets/widgets.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class AddProductScreen extends StatefulWidget {
-  const AddProductScreen({Key? key}) : super(key: key);
+  const AddProductScreen({
+    Key? key,
+    required this.isEdit,
+    this.product,
+  }) : super(key: key);
   static const String routeName = 'add_product_screen';
+  final bool isEdit;
+  final Product? product;
 
   static Route route() {
     return MaterialPageRoute(
       settings: const RouteSettings(name: routeName),
-      builder: (context) => const AddProductScreen(),
+      builder: (context) => const AddProductScreen(isEdit: false),
     );
   }
 
@@ -88,11 +94,53 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ));
   }
 
+  void setupScreenForUpdateMode() {
+    print(widget.product!);
+    // fill the field with current product information
+    _nameController.text = widget.product!.name!;
+    _priceController.text = widget.product!.price!.toString();
+    _quantityController.text = widget.product!.quantity!.toString();
+    _phoneNumberController.text = widget.product!.phone_number!;
+    _infoController.text = widget.product!.description!;
+
+    _category = widget.product!.category_id!;
+    _date = DateTime.parse(widget.product!.exp_date!);
+    _formattedDate = DateFormat('dd, MMMM yyyy').format(_date).toString();
+
+    // fill the number of days property
+    discountList = widget.product!.discount_list!.map((discount) {
+      discount.numberOfDays = _date.difference(discount.date!).inDays;
+      return discount;
+    }).toList();
+  }
+
+  void updateValuesInProductHolder() {
+    String name = _nameController.text;
+    double price = double.parse(_priceController.text);
+    int quantity = int.parse(_quantityController.text);
+    String phone_number = _phoneNumberController.text;
+    String description = _infoController.text;
+    int cat_id = _category;
+
+    widget.product!.name = name;
+    widget.product!.price = price;
+    widget.product!.quantity = quantity;
+    widget.product!.phone_number = phone_number;
+    widget.product!.description = description;
+    widget.product!.category_id = cat_id;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isEdit) setupScreenForUpdateMode();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MainAppBar(
-        title: 'ADD PRODUCT',
+        title: widget.isEdit ? 'EDIT PRODUCT' : 'ADD PRODUCT',
         leading: StyledIconButton(
           icon: Icons.close_rounded,
           onPressed: () {
@@ -113,47 +161,76 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 });
               }
               if (state is UploadSucceeded) {
-                // send the product to the api
-                String name = _nameController.text;
-                double price = double.parse(_priceController.text);
-                int quantity = int.parse(_quantityController.text);
-                String phone_number = _phoneNumberController.text;
-                String description = _infoController.text;
-                int cat_id = _category;
-                String exp_date = _date.toIso8601String();
+                int until = 0;
+                if (widget.isEdit) {
+                  // add the new image url
+                  widget.product!.image_url = state.imageUrl;
 
-                // fill the date field in discount list with properiate data
-                List<Discount> discounts = discountList;
+                  // update values in passed product object
+                  updateValuesInProductHolder();
 
-                for (Discount discount in discounts) {
-                  discount.date = _date.subtract(Duration(
-                    days: discount.numberOfDays!,
-                  ));
+                  until = 3;
+                  context
+                      .read<ProductBloc>()
+                      .add(UpdateProduct(widget.product!));
+                } else {
+                  // Add Mode
+
+                  // send the product to the api
+                  String name = _nameController.text;
+                  double price = double.parse(_priceController.text);
+                  int quantity = int.parse(_quantityController.text);
+                  String phone_number = _phoneNumberController.text;
+                  String description = _infoController.text;
+                  int cat_id = _category;
+                  String exp_date = _date.toIso8601String();
+
+                  List<Discount> discounts = discountList;
+
+                  for (Discount discount in discounts) {
+                    discount.date = _date.subtract(Duration(
+                      days: discount.numberOfDays!,
+                    ));
+                  }
+                  // new product
+                  Product product = Product(
+                    name: name,
+                    price: price,
+                    image_url: state.imageUrl,
+                    exp_date: exp_date,
+                    category_id: cat_id,
+                    quantity: quantity,
+                    phone_number: phone_number,
+                    description: description,
+                    discount_list: discounts,
+                  );
+                  until = 2;
+                  context
+                      .read<ProductBloc>()
+                      .add(ConfirmProductInsertion(product: product));
                 }
 
-                print(state.imageUrl);
-                Product product = Product(
-                  name: name,
-                  price: price,
-                  quantity: quantity,
-                  phone_number: phone_number,
-                  description: description,
-                  category_id: cat_id,
-                  exp_date: exp_date,
-                  image_url: state.imageUrl,
-                  discount_list: discounts,
-                );
-                context
-                    .read<ProductBloc>()
-                    .add(ConfirmProductInsertion(product: product));
+                // Go back to tyhe home screen
+
                 int count = 0;
-                Navigator.of(context).popUntil((_) => count++ >= 2);
+                Navigator.of(context).popUntil((_) => count++ >= until);
               }
             },
             child: StyledIconButton(
               icon: Icons.check_circle_outline_rounded,
               onPressed: () {
-                // validate fields
+                // validatge fields for updating product
+                if (widget.isEdit && _formKey.currentState!.validate()) {
+                  if (_image != null) {
+                    uploadImage(context);
+                  } else {
+                    updateValuesInProductHolder();
+                    context
+                        .read<ProductBloc>()
+                        .add(UpdateProduct(widget.product!));
+                  }
+                } else
+                // validate fields for add product
                 if (_formKey.currentState!.validate() &&
                     _image != null && // validate image selected
                     _formattedDate != // validate seleceted date
@@ -170,10 +247,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
       ),
       body: BlocListener<ProductBloc, ProductState>(
         listener: (context, state) {
-          if (state is ProductInsertionSucceeded) {
+          if (state is ProductInsertionSucceeded ||
+              state is ProductUpdateSucceeded) {
             // refresh the data
             context.read<ProductBloc>().add(const GetAllProducts());
-            Navigator.pop(context);
+
+            // Go back to the home screen
+            int count = 0;
+            Navigator.of(context).popUntil((_) => count++ >= 2);
           }
         },
         child: SizedBox(
@@ -275,152 +356,167 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       },
                       selectedCategory: _category,
                     ),
-                    SizedBox(height: kDefaultVerticalPadding),
-                    const SectionTitle(title: 'PRODUCT EXPIRY DATE'),
-                    SizedBox(height: kDefaultVerticalPadding),
-                    SfDateRangePicker(
-                      selectionMode: DateRangePickerSelectionMode.single,
-                      todayHighlightColor: kOxfordBlueColor,
-                      selectionColor: kOxfordBlueColor,
-                      onSelectionChanged: onDateSelectionChanged,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: kDefaultHorizontalPadding / 2),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Selected date:',
-                            textAlign: TextAlign.start,
-                            style:
-                                Theme.of(context).textTheme.bodyText1!.copyWith(
-                                      color: kOxfordBlueColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                          ),
-                          // if the date matches now date
-                          _formattedDate ==
-                                  DateFormat('dd, MMMM yyyy')
-                                      .format(DateTime.now())
-                                      .toString()
-                              ? Text(
-                                  '* select valid date',
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1!
-                                      .copyWith(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                )
-                              : Text(
-                                  _formattedDate,
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1!
-                                      .copyWith(
-                                        color: Colors.blue,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                        ],
+                    if (!widget.isEdit) ...[
+                      SizedBox(height: kDefaultVerticalPadding),
+                      const SectionTitle(title: 'PRODUCT EXPIRY DATE'),
+                      SizedBox(height: kDefaultVerticalPadding),
+                      SfDateRangePicker(
+                        selectionMode: DateRangePickerSelectionMode.single,
+                        todayHighlightColor: kOxfordBlueColor,
+                        selectionColor: kOxfordBlueColor,
+                        onSelectionChanged: onDateSelectionChanged,
                       ),
-                    ),
-                    SizedBox(height: kDefaultVerticalPadding),
-                    const SectionTitle(title: 'DISCOUNT DETAILS'),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: kDefaultHorizontalPadding / 2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Column(
-                            children: List.generate(
-                              discountList.length,
-                              (index) => DiscountCategoryCard(
-                                index: index,
-                                onDismissed: (direction) {
-                                  setState(() {
-                                    if (direction ==
-                                            DismissDirection.startToEnd ||
-                                        direction ==
-                                            DismissDirection.endToStart) {
-                                      discountList.removeAt(index);
-                                      print(discountList);
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: kDefaultHorizontalPadding / 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Selected date:',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText1!
+                                  .copyWith(
+                                    color: kOxfordBlueColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                            // if the date matches now date
+                            _formattedDate ==
+                                    DateFormat('dd, MMMM yyyy')
+                                        .format(DateTime.now())
+                                        .toString()
+                                ? Text(
+                                    '* select valid date',
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  )
+                                : Text(
+                                    _formattedDate,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: kDefaultVerticalPadding),
+                      const SectionTitle(title: 'DISCOUNT DETAILS'),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: kDefaultHorizontalPadding / 2),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Column(
+                              children: List.generate(
+                                discountList.length,
+                                (index) => DiscountCategoryCard(
+                                  index: index,
+                                  onDismissed: (direction) {
+                                    setState(() {
+                                      if (direction ==
+                                              DismissDirection.startToEnd ||
+                                          direction ==
+                                              DismissDirection.endToStart) {
+                                        discountList.removeAt(index);
+                                        print(discountList);
+                                      }
+                                    });
+                                  },
+                                  discount: discountList[index],
+                                  percentageValidator: (value) {
+                                    if (discountList[index]
+                                            .discount_percentage ==
+                                        null) {
+                                      // Required error message
+                                      return 'Required';
                                     }
-                                  });
-                                },
-                                discount: discountList[index],
-                                percentageValidator: (value) {
-                                  if (discountList[index].discount_percentage ==
-                                      null) {
-                                    // Required error message
-                                    return 'Required';
-                                  }
-                                  // search if the value is already taken
-                                  for (int i = 0;
-                                      i < discountList.length;
-                                      i++) {
-                                    if (i != index &&
-                                        discountList[i].discount_percentage ==
-                                            value) {
-                                      return 'already taken';
+                                    // search if the value is already taken
+                                    for (int i = 0;
+                                        i < discountList.length;
+                                        i++) {
+                                      if (i != index &&
+                                          discountList[i].discount_percentage ==
+                                              value) {
+                                        return 'already taken';
+                                      }
                                     }
-                                  }
-                                },
-                                daysValidator: (day) {
-                                  if (discountList[index].numberOfDays ==
-                                      null) {
-                                    // Required error message
-                                    return 'Required';
-                                  }
-                                  // if this category is taken retrn error
-                                  for (int i = 0;
-                                      i < discountList.length;
-                                      i++) {
-                                    if (i != index &&
-                                        discountList[i].numberOfDays == day) {
-                                      return 'already taken';
+                                  },
+                                  daysValidator: (day) {
+                                    if (discountList[index].numberOfDays ==
+                                        null) {
+                                      // Required error message
+                                      return 'Required';
                                     }
-                                  }
-                                },
-                                onNumberOfDaysChanged: (days) {
-                                  setState(() {
-                                    // When a new category changed, update it
-                                    discountList[index].numberOfDays = days!;
-                                  });
-                                },
-                                onDiscountPercentageChanged: (disc) {
-                                  setState(() {
-                                    // When a new value changed, update it
-                                    discountList[index].discount_percentage =
-                                        disc!;
-                                  });
-                                },
+                                    // if this category is taken retrn error
+                                    for (int i = 0;
+                                        i < discountList.length;
+                                        i++) {
+                                      if (i != index &&
+                                          discountList[i].numberOfDays == day) {
+                                        return 'already taken';
+                                      }
+                                    }
+                                  },
+                                  onNumberOfDaysChanged: (days) {
+                                    setState(() {
+                                      // When a new category changed, update it
+                                      discountList[index].numberOfDays = days!;
+                                    });
+                                  },
+                                  onDiscountPercentageChanged: (disc) {
+                                    setState(() {
+                                      // When a new value changed, update it
+                                      discountList[index].discount_percentage =
+                                          disc!;
+                                    });
+                                  },
+                                ),
                               ),
                             ),
-                          ),
 
-                          // Add new Discount button
-                          FlattedButton(
-                            title: '',
-                            icon: Icons.add_rounded,
-                            onPressed: () {
-                              setState(() {
-                                // add new discount category
-                                discountList.add(Discount());
-                              });
-                            },
-                          ),
-                        ],
+                            // Add new Discount button
+                            FlattedButton(
+                              title: '',
+                              icon: Icons.add_rounded,
+                              onPressed: () {
+                                setState(() {
+                                  // add new discount category
+                                  discountList.add(Discount());
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: kDefaultVerticalPadding / 2),
+                      SizedBox(height: kDefaultVerticalPadding / 2),
+                    ],
                     const SectionTitle(title: 'PRODUCT IMAGES'),
                     SizedBox(height: kDefaultVerticalPadding),
+                    if (_image == null && widget.isEdit)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.network(
+                          widget.product!.image_url!,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     _image != null
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(4),
@@ -431,15 +527,19 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               fit: BoxFit.cover,
                             ),
                           )
-                        : Text(
-                            '* select product image',
-                            textAlign: TextAlign.center,
-                            style:
-                                Theme.of(context).textTheme.bodyText1!.copyWith(
+                        : !widget.isEdit
+                            ? Text(
+                                '* select product image',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1!
+                                    .copyWith(
                                       color: Colors.red,
                                       fontWeight: FontWeight.w500,
                                     ),
-                          ),
+                              )
+                            : const SizedBox(),
                     SizedBox(height: kDefaultVerticalPadding),
                     SelectImageTextButton(
                       onPressed: () async {
